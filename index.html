@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ujjain Trip</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle, #4b1400, #1b0600);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: rgba(0,0,0,0.6);
+  padding: 25px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 0 25px orange;
+}
+
+.hidden {
+  display: none;
+}
+
+h1 { color: #ffcc70; }
+h2 { color: #ffdca8; font-weight: normal; }
+
+.quote {
+  font-style: italic;
+  color: #ffddaa;
+  margin: 15px 0 25px;
+  border-left: 3px solid orange;
+  padding-left: 12px;
+}
+
+/* YES / NO buttons */
+.buttons {
+  position: relative;
+  height: 80px;
+  margin-top: 25px;
+}
+
+button {
+  padding: 14px 30px;
+  border-radius: 30px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#yes {
+  background: #ff9800;
+  color: #2c0b00;
+  position: absolute;
+  left: 25%;
+}
+
+#no {
+  background: #555;
+  color: white;
+  position: absolute;
+  left: 55%;
+}
+
+/* Calendar */
+.month {
+  font-size: 1.3rem;
+  color: #ffcc70;
+  margin-bottom: 10px;
+}
+
+.weekdays, .calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.weekdays div {
+  font-size: 0.75rem;
+  color: #ffb347;
+}
+
+.day {
+  background: #3b1200;
+  padding: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.day.selected {
+  background: linear-gradient(135deg, #ff9800, #ffc107);
+  color: black;
+  font-weight: bold;
+}
+
+.empty {
+  visibility: hidden;
+}
+
+.note {
+  margin-top: 15px;
+  color: #ffddaa;
+}
+
+/* Confirm button */
+#confirm {
+  margin-top: 20px;
+  background: #888;
+  color: #222;
+  cursor: not-allowed;
+}
+
+#confirm:enabled {
+  background: #ff9800;
+  color: #2c0b00;
+  cursor: pointer;
+  box-shadow: 0 0 15px orange;
+}
+</style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div class="container" id="page1">
+  <h1>Are you ready for the trip?</h1>
+  <h2>Ujjain – Mahakal 🕉️</h2>
+
+  <div class="buttons">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="container hidden" id="page2">
+  <h1>Har Har Mahadev 🔱</h1>
+
+  <div class="quote">
+    “Kaal bhi uska kya bigaade,  
+    jo bhakt ho Mahakaal ka.”
+  </div>
+
+  <div class="month">February</div>
+
+  <div class="weekdays">
+    <div>Sun</div><div>Mon</div><div>Tue</div>
+    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="note">
+    Selected days: <span id="count">0</span> / 3
+  </div>
+
+  <button id="confirm" disabled>Confirm Trip</button>
+</div>
+
+<script>
+/* YES → go to page 2 */
+document.getElementById("yes").onclick = () => {
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("page2").classList.remove("hidden");
+};
+
+/* NO → escape (desktop + mobile) */
+const noBtn = document.getElementById("no");
+["mouseover", "touchstart"].forEach(evt => {
+  noBtn.addEventListener(evt, () => {
+    noBtn.style.left = Math.random() * 60 + "%";
+    noBtn.style.top = Math.random() * 40 + "%";
+  });
+});
+
+/* Calendar logic */
+const calendar = document.getElementById("calendar");
+const countEl = document.getElementById("count");
+const confirmBtn = document.getElementById("confirm");
+
+let selected = 0;
+const totalDays = 28;
+const startDay = 0; // February starts Sunday (simple & stable)
+
+/* Empty slots */
+for (let i = 0; i < startDay; i++) {
+  calendar.appendChild(document.createElement("div")).className = "empty";
+}
+
+/* Days */
+for (let d = 1; d <= totalDays; d++) {
+  const day = document.createElement("div");
+  day.className = "day";
+  day.textContent = d;
+
+  day.onclick = () => {
+    if (!day.classList.contains("selected") && selected >= 3) return;
+
+    day.classList.toggle("selected");
+    selected += day.classList.contains("selected") ? 1 : -1;
+    countEl.textContent = selected;
+
+    confirmBtn.disabled = selected !== 3;
+  };
+
+  calendar.appendChild(day);
+}
+
+/* Confirm */
+confirmBtn.onclick = () => {
+  alert("🙏 Trip confirmed! Har Har Mahadev 🔱");
+};
+</script>
+
+</body>
+</html>

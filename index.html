@@ -27,9 +27,7 @@ body {
   box-shadow: 0 0 25px orange;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 h1 { color: #ffcc70; }
 h2 { color: #ffdca8; font-weight: normal; }
@@ -42,11 +40,11 @@ h2 { color: #ffdca8; font-weight: normal; }
   padding-left: 12px;
 }
 
-/* YES / NO buttons */
+/* Buttons */
 .buttons {
   position: relative;
-  height: 80px;
-  margin-top: 25px;
+  height: 100px;
+  margin-top: 30px;
 }
 
 button {
@@ -55,19 +53,20 @@ button {
   border: none;
   font-size: 1rem;
   cursor: pointer;
+  position: absolute;
+  top: 20px;
+  z-index: 10;
 }
 
 #yes {
   background: #ff9800;
   color: #2c0b00;
-  position: absolute;
-  left: 25%;
+  left: 20%;
 }
 
 #no {
   background: #555;
   color: white;
-  position: absolute;
   left: 55%;
 }
 
@@ -102,16 +101,13 @@ button {
   font-weight: bold;
 }
 
-.empty {
-  visibility: hidden;
-}
+.empty { visibility: hidden; }
 
 .note {
   margin-top: 15px;
   color: #ffddaa;
 }
 
-/* Confirm button */
 #confirm {
   margin-top: 20px;
   background: #888;
@@ -167,59 +163,78 @@ button {
 </div>
 
 <script>
-/* YES → go to page 2 */
-document.getElementById("yes").onclick = () => {
-  document.getElementById("page1").classList.add("hidden");
-  document.getElementById("page2").classList.remove("hidden");
-};
+document.addEventListener("DOMContentLoaded", () => {
 
-/* NO → escape (desktop + mobile) */
-const noBtn = document.getElementById("no");
-["mouseover", "touchstart"].forEach(evt => {
-  noBtn.addEventListener(evt, () => {
-    noBtn.style.left = Math.random() * 60 + "%";
-    noBtn.style.top = Math.random() * 40 + "%";
+  // YES button
+  document.getElementById("yes").addEventListener("click", () => {
+    document.getElementById("page1").classList.add("hidden");
+    document.getElementById("page2").classList.remove("hidden");
   });
-});
 
-/* Calendar logic */
-const calendar = document.getElementById("calendar");
-const countEl = document.getElementById("count");
-const confirmBtn = document.getElementById("confirm");
+  // NO button movement (only when touching NO)
+  const noBtn = document.getElementById("no");
+  ["mouseenter", "touchstart"].forEach(evt => {
+    noBtn.addEventListener(evt, () => {
+      noBtn.style.left = Math.random() * 60 + "%";
+      noBtn.style.top = Math.random() * 40 + "px";
+    });
+  });
 
-let selected = 0;
-const totalDays = 28;
-const startDay = 0; // February starts Sunday (simple & stable)
+  // Calendar logic
+  const calendar = document.getElementById("calendar");
+  const countEl = document.getElementById("count");
+  const confirmBtn = document.getElementById("confirm");
 
-/* Empty slots */
-for (let i = 0; i < startDay; i++) {
-  calendar.appendChild(document.createElement("div")).className = "empty";
-}
+  let selected = 0;
 
-/* Days */
-for (let d = 1; d <= totalDays; d++) {
-  const day = document.createElement("div");
-  day.className = "day";
-  day.textContent = d;
+  for (let d = 1; d <= 28; d++) {
+    const day = document.createElement("div");
+    day.className = "day";
+    day.textContent = d;
 
-  day.onclick = () => {
-    if (!day.classList.contains("selected") && selected >= 3) return;
+    day.onclick = () => {
+      if (!day.classList.contains("selected") && selected >= 3) return;
 
-    day.classList.toggle("selected");
-    selected += day.classList.contains("selected") ? 1 : -1;
-    countEl.textContent = selected;
+      day.classList.toggle("selected");
+      selected += day.classList.contains("selected") ? 1 : -1;
+      countEl.textContent = selected;
+      confirmBtn.disabled = selected !== 3;
+    };
 
-    confirmBtn.disabled = selected !== 3;
+    calendar.appendChild(day);
+  }
+
+  // Confirm
+  confirmBtn.onclick = () => {
+    const days = [];
+    document.querySelectorAll(".day.selected").forEach(d => days.push(d.textContent));
+
+    calendar.style.display = "none";
+    confirmBtn.style.display = "none";
+
+    const msg = document.createElement("div");
+    msg.innerHTML = `
+      <h2>🙏 Trip Confirmed!</h2>
+      <p>Har Har Mahadev 🔱</p>
+      <strong>${days.join(", ")} February</strong>
+    `;
+    msg.style.marginTop = "20px";
+    msg.style.color = "#ffddaa";
+    document.getElementById("page2").appendChild(msg);
+
+    const text = `🙏 Har Har Mahadev 🔱
+My Ujjain trip is confirmed!
+Dates: ${days.join(", ")} February`;
+
+    window.open(
+      "https://wa.me/91881867614?text=" + encodeURIComponent(text),
+      "_blank"
+    );
   };
 
-  calendar.appendChild(day);
-}
-
-/* Confirm */
-confirmBtn.onclick = () => {
-  alert("🙏 Trip confirmed! Har Har Mahadev 🔱");
-};
+});
 </script>
 
 </body>
 </html>
+
